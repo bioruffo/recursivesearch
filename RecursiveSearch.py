@@ -92,7 +92,7 @@ class Retriever(object):
         else:
             call = list(oldcall)
         # If the current iterable is a list, then iterate over the indices
-        if isinstance(iterable, list):
+        if isinstance(iterable, list) or isinstance(iterable, tuple):
             for i in range(len(iterable)):
                 self.__recursive__(iterable[i], call+[i])
         # If it's a set, add all its items to the main dict, with paths
@@ -104,6 +104,11 @@ class Retriever(object):
             for key in iterable.keys():
                 self.itemsdict[key] = self.itemsdict.get(key, [])+[call + [False]]
                 self.__recursive__(iterable[key], call+[key])
+                # tuples or frozensets can be keys too
+                if isinstance(key, tuple) or isinstance(key, frozenset):
+                    self.__recursive__(key, call)
+                    
+                
         else:
             # At this point we should only have numbers and strings; add to the main dict
             try:
