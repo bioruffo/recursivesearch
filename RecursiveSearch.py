@@ -124,7 +124,7 @@ class Retriever(object):
         element is not present.
 
         '''
-        return self.itemsdict.get(item, [None])
+        return self.itemsdict.get(item, None)
     
 
     def get_parent(self, data, pathno=0):
@@ -135,7 +135,7 @@ class Retriever(object):
         
         '''
         routes = self.__track__(data)
-        if len(routes) > pathno:
+        if routes and len(routes) > pathno:
             # Remove the appropriate number of items, depending on the final bool;
             # for dict keys and set items, we need to iterate one less time.
             if routes[pathno][-1]:
@@ -155,9 +155,13 @@ class Retriever(object):
         from the original nested iterable (or from self.original_data).
         
         '''
-        retstring = ""
-        for element in self.__track__(data):
-            retstring += '['+']['.join(['"'+i+'"' if type(i) == str else str(i) for i in element[:-1]])+']\n'
-        return retstring
+        routes = self.__track__(data)
+        if routes:
+            retstring = ""
+            for element in self.__track__(data):
+                retstring += '['+']['.join(['"'+i+'"' if type(i) == str else str(i) for i in element[:-1]])+']\n'
+            return retstring
+        else:
+            return None
 
 
