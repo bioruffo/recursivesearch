@@ -33,23 +33,23 @@ Example:
 >>> my_data[2][1]["bar"]
 4
 
- # finally, retr.__track__(item) will return a list of lists of indices and keys,
+ # finally, retr._track(item) will return a list of lists of indices and keys,
 BUT it will also include, at the end, the bool True if "item" is a list item or
 a dict value, and False if the item is a dict key or a set item. This is necessary
-to retrieve the correct parent. __track__ is mostly meant to be used by the other
+to retrieve the correct parent. _track is mostly meant to be used by the other
 class methods, but it could have interesting applications.
 
 
->>> print(retr.__track__("foo"))
+>>> print(retr._track("foo"))
 [[0, True]]
  #"True" relates to "foo" being a list item
->>> print(retr.__track__(4))
+>>> print(retr._track(4))
 [[2, 1, 'bar', True]]
  #"True" relates to 4 being a dictionary value
->>> print(retr.__track__(5))
+>>> print(retr._track(5))
 [[3, False]]
 #"False" relates to 5 being a set item
->>> print(retr.__track__("bar"))
+>>> print(retr._track("bar"))
 [[2, 1, False]]
 #"False" relates to "bar" being a dictionary key
 
@@ -118,7 +118,7 @@ class Retriever(object):
                 print("Unhashable, uncatalogued type: ", type(self.itemsdict[iterable]))
     
 
-    def __track__(self, item):
+    def _track(self, item):
         '''Return the list of paths associated with a key item.
         Return [None] (literally a list containing one element, None) if the
         element is not present.
@@ -134,7 +134,7 @@ class Retriever(object):
         Return None if no path iss found or if the path number is out of range.
         
         '''
-        routes = self.__track__(data)
+        routes = self._track(data)
         if routes and len(routes) > pathno:
             # Remove the appropriate number of items, depending on the final bool;
             # for dict keys and set items, we need to iterate one less time.
@@ -155,10 +155,10 @@ class Retriever(object):
         from the original nested iterable (or from self.original_data).
         
         '''
-        routes = self.__track__(data)
+        routes = self._track(data)
         if routes:
             retstring = ""
-            for element in self.__track__(data):
+            for element in self._track(data):
                 retstring += '['+']['.join(['"'+i+'"' if type(i) == str else str(i) for i in element[:-1]])+']\n'
             return retstring
         else:
